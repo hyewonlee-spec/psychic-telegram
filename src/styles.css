@@ -1060,132 +1060,64 @@ textarea {
 
 
 /* ==========================================================================
-   Day modal photo viewer — portrait 3:4 with compact actions
+   Day modal final lock — full-height sheet + large centred portrait photo
    ========================================================================== */
 
 /*
-   Calendar cells stay compact.
-   The modal is now the place to view the photo properly in a portrait 3:4 frame.
+   Final modal source of truth.
+   This replaces the earlier overlapping modal sizing rules.
+   Goal:
+   - Modal bottom stays visible on iPhone screens.
+   - Photo remains large.
+   - Photo fills the portrait container.
+   - Photo is centred vertically and horizontally.
 */
 
-.day-modal {
-  width: min(100%, 28rem);
+.modal-backdrop {
+  align-items: center;
+  padding: max(0.5rem, env(safe-area-inset-top)) 0.5rem max(0.5rem, env(safe-area-inset-bottom));
 }
-
-.photo-preview {
-  width: min(100%, 19rem);
-  aspect-ratio: 3 / 4;
-  justify-self: center;
-  border-radius: 1.35rem;
-  background: #efe4d4;
-}
-
-.photo-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: #efe4d4;
-}
-
-.photo-placeholder {
-  min-height: 100%;
-}
-
-.photo-action-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.55rem;
-}
-
-.upload-control--compact,
-.secondary-button--compact {
-  min-height: 2.35rem;
-  padding: 0.55rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.86rem;
-}
-
-.secondary-button--compact {
-  background: #f1e6d9;
-  color: var(--ink);
-  font-weight: 900;
-}
-
-.caption-input {
-  min-height: 6.5rem;
-}
-
-/* Make the modal feel like a viewer on phones, not a cramped form. */
-@media (max-width: 680px) {
-  .modal-backdrop {
-    align-items: end;
-    padding: 0.55rem;
-  }
-
-  .day-modal {
-    width: 100%;
-    max-height: 94svh;
-    padding: 0.85rem;
-    border-radius: 1.35rem 1.35rem 1rem 1rem;
-  }
-
-  .modal-header {
-    margin-bottom: 0.75rem;
-  }
-
-  .day-form {
-    gap: 0.75rem;
-  }
-
-  .photo-preview {
-    width: min(100%, 17.5rem);
-    max-height: 54svh;
-  }
-
-  .photo-action-row {
-    gap: 0.45rem;
-  }
-
-  .upload-control--compact,
-  .secondary-button--compact {
-    min-height: 2.25rem;
-    padding: 0.5rem 0.65rem;
-    font-size: 0.82rem;
-  }
-
-  .caption-input {
-    min-height: 5.8rem;
-  }
-}
-
-
-/* ==========================================================================
-   Day modal fit repair — full bottom visible + centered filled photo
-   ========================================================================== */
-
-/*
-   Repairs the mobile modal so the bottom actions are visible on screen.
-   The photo now fills the portrait viewer and is centred both vertically
-   and horizontally.
-*/
 
 .day-modal {
-  display: grid;
-  gap: 0.75rem;
+  width: min(100%, 30rem);
+  max-height: calc(100dvh - 1rem);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.8rem;
+  border-radius: 1.45rem;
+}
+
+.modal-header {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+}
+
+.modal-header h2 {
+  font-size: clamp(1.45rem, 5vw, 2rem);
+  line-height: 1.05;
 }
 
 .day-form {
-  gap: 0.75rem;
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
-/* Photo fills the portrait frame instead of sitting with large side gutters. */
 .photo-preview {
+  flex: 0 0 auto;
   display: grid;
-  place-items: center;
-  width: min(100%, 17.2rem);
+  width: min(100%, 20rem);
   aspect-ratio: 3 / 4;
-  max-height: 43svh;
+  place-items: center;
   justify-self: center;
+  align-self: center;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: #efe4d4;
 }
 
 .photo-preview img {
@@ -1196,69 +1128,86 @@ textarea {
   object-position: center center;
 }
 
-/* Keep controls compact so the modal bottom is visible. */
 .photo-action-row {
-  gap: 0.45rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
 }
 
 .upload-control--compact,
 .secondary-button--compact {
-  min-height: 2.15rem;
-  padding: 0.45rem 0.65rem;
-  font-size: 0.82rem;
+  min-height: 2.2rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
 }
 
 .caption-input {
-  min-height: 4.9rem;
-  max-height: 6.2rem;
+  min-height: 4.75rem;
+  max-height: 5.75rem;
+  padding: 0.85rem;
 }
 
 .modal-actions {
-  gap: 0.65rem;
+  flex: 0 0 auto;
+  gap: 0.55rem;
 }
 
 .modal-actions .primary-button,
 .modal-actions .danger-button {
-  min-height: 2.65rem;
-  padding-block: 0.65rem;
+  min-height: 2.45rem;
+  padding-block: 0.55rem;
 }
 
-/* Phone modal: fit the full content into the visible screen. */
+/* iPhone layout: use more of the screen so the photo does not shrink. */
 @media (max-width: 680px) {
   .modal-backdrop {
-    align-items: end;
-    padding: 0.45rem;
+    align-items: center;
+    padding: max(0.4rem, env(safe-area-inset-top)) 0.4rem max(0.4rem, env(safe-area-inset-bottom));
   }
 
   .day-modal {
     width: 100%;
-    max-height: calc(100svh - 0.9rem);
-    overflow: auto;
-    padding: 0.75rem;
+    height: calc(100dvh - max(0.8rem, env(safe-area-inset-top)) - max(0.8rem, env(safe-area-inset-bottom)));
+    max-height: calc(100dvh - max(0.8rem, env(safe-area-inset-top)) - max(0.8rem, env(safe-area-inset-bottom)));
+    padding: 0.7rem;
     border-radius: 1.25rem;
+    overflow: hidden;
   }
 
   .modal-header {
-    margin-bottom: 0;
+    gap: 0.6rem;
+  }
+
+  .modal-header .eyebrow {
+    margin-bottom: 0.22rem;
+    font-size: 0.66rem;
   }
 
   .modal-header h2 {
-    font-size: clamp(1.35rem, 6vw, 1.8rem);
-    line-height: 1.05;
+    font-size: clamp(1.4rem, 6vw, 1.85rem);
+  }
+
+  .modal-header .icon-button {
+    width: 2.35rem;
+    height: 2.35rem;
+    flex: 0 0 auto;
   }
 
   .day-form {
-    gap: 0.62rem;
+    gap: 0.55rem;
+    overflow: hidden;
   }
 
   .photo-preview {
-    width: min(100%, 15.8rem);
-    max-height: 39svh;
-    border-radius: 1.15rem;
+    width: auto;
+    height: min(44dvh, 22.5rem);
+    max-width: 100%;
+    aspect-ratio: 3 / 4;
   }
 
   .photo-action-row {
-    gap: 0.4rem;
+    gap: 0.45rem;
   }
 
   .upload-control--compact,
@@ -1269,42 +1218,54 @@ textarea {
   }
 
   .caption-input {
-    min-height: 4.4rem;
-    max-height: 5.4rem;
-    padding: 0.75rem;
+    min-height: 4.1rem;
+    max-height: 4.9rem;
+    padding: 0.72rem;
+    font-size: 0.95rem;
   }
 
   .modal-actions {
-    gap: 0.55rem;
-  }
-
-  .modal-actions .primary-button,
-  .modal-actions .danger-button {
-    min-height: 2.45rem;
-    padding-block: 0.55rem;
-  }
-
-  .safe-note,
-  .pending-removal {
-    padding: 0.58rem 0.7rem;
-    font-size: 0.78rem;
-  }
-}
-
-/* Extra-short phone screens: reduce photo height a little more. */
-@media (max-height: 760px) and (max-width: 680px) {
-  .photo-preview {
-    width: min(100%, 14.4rem);
-    max-height: 34svh;
-  }
-
-  .caption-input {
-    min-height: 3.8rem;
-    max-height: 4.5rem;
+    gap: 0.5rem;
   }
 
   .modal-actions .primary-button,
   .modal-actions .danger-button {
     min-height: 2.3rem;
+    padding-block: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .safe-note,
+  .pending-removal {
+    padding: 0.52rem 0.65rem;
+    font-size: 0.76rem;
+  }
+}
+
+/* Short phones: preserve bottom visibility first, then reduce photo only slightly. */
+@media (max-width: 680px) and (max-height: 760px) {
+  .photo-preview {
+    height: min(39dvh, 19.5rem);
+  }
+
+  .caption-input {
+    min-height: 3.6rem;
+    max-height: 4.1rem;
+  }
+
+  .modal-actions .primary-button,
+  .modal-actions .danger-button {
+    min-height: 2.18rem;
+  }
+}
+
+/* Very short screens still remain usable with internal scroll rather than clipping. */
+@media (max-width: 680px) and (max-height: 660px) {
+  .day-modal {
+    overflow: auto;
+  }
+
+  .photo-preview {
+    height: min(34dvh, 16.5rem);
   }
 }
