@@ -717,3 +717,154 @@ textarea {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+
+/* ==========================================================================
+   Photo density, caption preview, safer edit/delete, PWA install
+   ========================================================================== */
+
+/*
+   This patch keeps the calendar as a true date grid, improves how photos crop
+   inside the small day cells, adds a tiny caption marker, makes destructive
+   actions safer, and adds install-to-home-screen UI support.
+*/
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.install-button {
+  display: inline-flex;
+  min-height: 2.65rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 0.85rem;
+  background: rgba(255, 250, 241, 0.84);
+  color: var(--ink);
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* Calendar thumbnails: photo fills each date square cleanly without looking too zoomed. */
+.day-cell--photo img {
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.001);
+}
+
+/* Slightly darken photo cells so date badge and note marker stay readable. */
+.day-cell--photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(52, 47, 40, 0.18), transparent 34%),
+    linear-gradient(0deg, rgba(52, 47, 40, 0.20), transparent 42%);
+}
+
+/* Date and caption elements sit above photo overlays. */
+.date-badge,
+.caption-strip,
+.note-dot {
+  z-index: 2;
+}
+
+/* Tiny caption marker for days with notes. */
+.note-dot {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.45rem;
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 999px;
+  background: #fffaf1;
+  box-shadow: 0 0 0 2px rgba(52, 47, 40, 0.28);
+}
+
+/* Keep full captions available on larger screens, but small and secondary. */
+.caption-strip {
+  max-width: calc(100% - 1.2rem);
+  opacity: 0.92;
+}
+
+/* Photo view keeps the more enjoyable 4:3 ratio. */
+.photo-view-card img {
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* Safer edit/delete feedback. */
+.safe-note,
+.pending-removal {
+  margin: 0;
+  border-radius: 1rem;
+  background: #fff1df;
+  color: var(--accent-deep);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.safe-note {
+  padding: 0.7rem 0.85rem;
+}
+
+.pending-removal {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.pending-removal p {
+  margin: 0;
+}
+
+.pending-removal .text-button {
+  justify-self: start;
+  padding: 0;
+}
+
+.danger-button--confirm {
+  background: var(--danger);
+  color: #fffaf1;
+}
+
+/* iPhone app-like install friendliness. */
+@media (display-mode: standalone) {
+  .install-button {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .install-button {
+    min-height: 2.45rem;
+    padding: 0 0.7rem;
+    font-size: 0.8rem;
+  }
+
+  .top-actions {
+    gap: 0.35rem;
+  }
+
+  .day-cell--photo img {
+    transform: none;
+  }
+
+  .note-dot {
+    right: 0.32rem;
+    bottom: 0.32rem;
+    width: 0.42rem;
+    height: 0.42rem;
+  }
+
+  .caption-strip {
+    display: none;
+  }
+}

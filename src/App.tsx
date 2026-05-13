@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
-import { CalendarDays, Camera, ChevronLeft, ChevronRight, Grid3X3, ImagePlus, Loader2, LogOut, Trash2, X } from 'lucide-react';
+import { CalendarDays, Camera, ChevronLeft, ChevronRight, Download, Grid3X3, ImagePlus, Loader2, LogOut, Trash2, X } from 'lucide-react';
 import type { Session } from '@supabase/supabase-js';
 import { CALENDAR_PHOTOS_BUCKET, supabase } from './lib/supabase';
 import type { CalendarEntry, EntryWithUrl } from './types';
@@ -10,6 +10,12 @@ import {
   getMonthRange,
   toDateKey,
 } from './utils/date';
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+};
+
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -133,9 +139,38 @@ function CalendarApp({ session }: { session: Session }) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [status, setStatus] = useState('');
   const [viewMode, setViewMode] = useState<'calendar' | 'photos'>('calendar');
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installMessage, setInstallMessage] = useState('');
 
   const monthDays = useMemo(() => getMonthMatrix(activeMonth), [activeMonth]);
   const selectedEntry = selectedDate ? entries[selectedDate] : undefined;
+
+  useEffect(() => {
+    function handleBeforeInstallPrompt(event: Event) {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    }
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  async function handleInstallApp() {
+    if (!installPrompt) {
+      setInstallMessage('On iPhone/iPad: open Safari, tap Share, then Add to Home Screen.');
+      return;
+    }
+
+    await installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+
+    if (choice.outcome === 'accepted') {
+      setInstallMessage('Install started.');
+      setInstallPrompt(null);
+    } else {
+      setInstallMessage('Install cancelled. You can try again later.');
+    }
+  }
 
   async function loadEntries(month = activeMonth) {
     setLoading(true);
@@ -265,9 +300,15 @@ function CalendarApp({ session }: { session: Session }) {
           <p className="eyebrow">Private photo diary</p>
           <h1>Memory Calendar</h1>
         </div>
-        <button className="icon-button" type="button" onClick={() => supabase.auth.signOut()} aria-label="Sign out">
-          <LogOut size={20} />
-        </button>
+        <div className="top-actions">
+          <button className="install-button" type="button" onClick={handleInstallApp}>
+            <Download size={16} />
+            Install
+          </button>
+          <button className="icon-button" type="button" onClick={() => supabase.auth.signOut()} aria-label="Sign out">
+            <LogOut size={20} />
+          </button>
+        </div>
       </header>
 
       <section className="calendar-card">
@@ -304,6 +345,7 @@ function CalendarApp({ session }: { session: Session }) {
         </div>
 
         {status && <p className="status-message">{status}</p>}
+        {installMessage && <p className="status-message">{installMessage}</p>}
 
         {viewMode === 'calendar' ? (
           <>
@@ -334,6 +376,7 @@ function CalendarApp({ session }: { session: Session }) {
                       <span className="empty-photo"><ImagePlus size={18} /></span>
                     )}
                     <span className="date-badge">{date.getDate()}</span>
+                    {entry?.caption && <span className="note-dot" aria-label="Caption saved" title={entry.caption} />}
                     {entry?.caption && <span className="caption-strip">{entry.caption}</span>}
                   </button>
                 );
@@ -406,6 +449,7 @@ function DayModal({
   const [previewUrl, setPreviewUrl] = useState(entry?.signedUrl ?? '');
   const [removePhoto, setRemovePhoto] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const nextFile = event.target.files?.[0] ?? null;
@@ -455,7 +499,11 @@ function DayModal({
             <input type="file" accept="image/*" onChange={handleFileChange} />
           </label>
 
-          {(entry?.photo_path || file) && (
+          {file && entry?.photo_path && (
+            <p className="safe-note">Your old picture will stay saved until you tap Save day.</p>
+          )}
+
+          {(entry?.photo_path || file) && !removePhoto && (
             <button
               className="secondary-button"
               type="button"
@@ -467,6 +515,22 @@ function DayModal({
             >
               Remove picture
             </button>
+          )}
+
+          {removePhoto && (
+            <div className="pending-removal">
+              <p>Picture marked for removal. It will only be deleted after you tap Save day.</p>
+              <button
+                className="text-button"
+                type="button"
+                onClick={() => {
+                  setRemovePhoto(false);
+                  setPreviewUrl(entry?.signedUrl ?? '');
+                }}
+              >
+                Undo remove picture
+              </button>
+            </div>
           )}
 
           <label>
@@ -481,9 +545,19 @@ function DayModal({
 
           <div className="modal-actions">
             {entry && (
-              <button className="danger-button" type="button" onClick={() => onDelete(dateKey)}>
+              <button
+                className={confirmDelete ? 'danger-button danger-button--confirm' : 'danger-button'}
+                type="button"
+                onClick={() => {
+                  if (confirmDelete) {
+                    onDelete(dateKey);
+                    return;
+                  }
+                  setConfirmDelete(true);
+                }}
+              >
                 <Trash2 size={16} />
-                Delete day
+                {confirmDelete ? 'Tap again to delete' : 'Delete day'}
               </button>
             )}
             <button className="primary-button" type="submit" disabled={saving}>
