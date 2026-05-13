@@ -1,0 +1,522 @@
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #342f28;
+  background: #f5efe4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --cream: #f5efe4;
+  --paper: #fffaf1;
+  --paper-deep: #eee6d8;
+  --ink: #342f28;
+  --muted: #786f63;
+  --line: rgba(52, 47, 40, 0.12);
+  --accent: #a66f5c;
+  --accent-deep: #754b3f;
+  --danger: #9c3f35;
+  --shadow: 0 20px 70px rgba(77, 61, 47, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 32rem),
+    linear-gradient(135deg, #f6efe4 0%, #ede1d0 100%);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Shared UI
+   ========================================================================== */
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--accent-deep);
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.primary-button,
+.secondary-button,
+.danger-button,
+.text-button,
+.icon-button,
+.upload-control {
+  border: 0;
+  border-radius: 999px;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.danger-button:hover,
+.icon-button:hover,
+.upload-control:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 3rem;
+  padding: 0.75rem 1.2rem;
+  background: var(--ink);
+  color: #fffaf1;
+  font-weight: 800;
+  box-shadow: 0 12px 24px rgba(52, 47, 40, 0.16);
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+}
+
+.secondary-button {
+  min-height: 2.65rem;
+  padding: 0.7rem 1rem;
+  background: #f1e6d9;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.65rem;
+  padding: 0.7rem 1rem;
+  background: #f5ddd8;
+  color: var(--danger);
+  font-weight: 800;
+}
+
+.text-button {
+  background: transparent;
+  color: var(--accent-deep);
+  font-weight: 800;
+}
+
+.icon-button {
+  display: inline-flex;
+  width: 2.65rem;
+  height: 2.65rem;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 250, 241, 0.84);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.status-message,
+.form-message {
+  margin: 0;
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+  background: #fff1df;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Auth
+   ========================================================================== */
+
+.auth-page,
+.loader-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.loader-page {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.auth-card {
+  width: min(100%, 28rem);
+  padding: 2rem;
+  border-radius: 2rem;
+  background: rgba(255, 250, 241, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.brand-mark {
+  display: grid;
+  width: 3.4rem;
+  height: 3.4rem;
+  place-items: center;
+  margin-bottom: 1.25rem;
+  border-radius: 1.2rem;
+  background: var(--ink);
+  color: #fffaf1;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.auth-card h1 {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 3.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.auth-intro {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.auth-form,
+.day-form {
+  display: grid;
+  gap: 1rem;
+}
+
+label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: #fffdf8;
+  color: var(--ink);
+  outline: none;
+}
+
+input {
+  min-height: 3rem;
+  padding: 0.8rem 0.9rem;
+}
+
+textarea {
+  resize: vertical;
+  padding: 0.9rem;
+}
+
+/* ==========================================================================
+   App Shell
+   ========================================================================== */
+
+.app-shell {
+  width: min(100%, 74rem);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.top-bar,
+.month-toolbar,
+.modal-header,
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.top-bar {
+  padding: 0.5rem 0.25rem 1rem;
+}
+
+.top-bar h1 {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+}
+
+.calendar-card {
+  padding: clamp(0.85rem, 3vw, 1.4rem);
+  border-radius: 2rem;
+  background: rgba(255, 250, 241, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.month-toolbar {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.month-toolbar h2 {
+  margin: 0;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  letter-spacing: -0.04em;
+}
+
+.month-toolbar p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.weekday-grid,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(0.35rem, 1.5vw, 0.75rem);
+}
+
+.weekday-grid {
+  margin-bottom: 0.55rem;
+}
+
+.weekday-grid span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.day-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 0;
+  border-radius: clamp(0.85rem, 2vw, 1.25rem);
+  background: #f2e8d9;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.day-cell--empty {
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.day-cell--today {
+  box-shadow: inset 0 0 0 3px rgba(166, 111, 92, 0.58);
+}
+
+.day-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.01);
+}
+
+.empty-photo {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: rgba(52, 47, 40, 0.4);
+}
+
+.date-badge {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  display: grid;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 250, 241, 0.9);
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.caption-strip {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.35rem;
+  left: 0.35rem;
+  overflow: hidden;
+  padding: 0.28rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(52, 47, 40, 0.72);
+  color: #fffaf1;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-footer {
+  padding: 1rem 0.25rem;
+  color: var(--muted);
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Day Modal
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: end center;
+  padding: 1rem;
+  background: rgba(52, 47, 40, 0.36);
+  backdrop-filter: blur(8px);
+}
+
+.day-modal {
+  width: min(100%, 32rem);
+  max-height: min(92vh, 48rem);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 2rem;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+}
+
+.modal-header {
+  margin-bottom: 1rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.04em;
+}
+
+.photo-preview {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: #efe4d4;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-placeholder {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: rgba(52, 47, 40, 0.5);
+  font-weight: 900;
+}
+
+.upload-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.85rem;
+  padding: 0.75rem 1rem;
+  background: #eadccb;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.upload-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-actions {
+  align-items: stretch;
+}
+
+.modal-actions .primary-button,
+.modal-actions .danger-button {
+  flex: 1;
+}
+
+/* ==========================================================================
+   Mobile tuning
+   ========================================================================== */
+
+@media (max-width: 680px) {
+  .app-shell {
+    padding: 0.75rem;
+  }
+
+  .calendar-card {
+    border-radius: 1.5rem;
+  }
+
+  .weekday-grid,
+  .calendar-grid {
+    gap: 0.28rem;
+  }
+
+  .day-cell {
+    border-radius: 0.72rem;
+  }
+
+  .date-badge {
+    top: 0.25rem;
+    left: 0.25rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    font-size: 0.68rem;
+  }
+
+  .caption-strip {
+    display: none;
+  }
+
+  .modal-backdrop {
+    padding: 0.75rem;
+  }
+
+  .day-modal {
+    border-radius: 1.5rem;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+}
