@@ -1,16 +1,20 @@
-# Memory Calendar — Bottom Nav + Calendar Fit Patch
+# Memory Calendar — Clean 3:4 Mobile Calendar Patch
 
 Replace this file only:
 
 - src/styles.css
 
-What this changes:
-- Moves Calendar / Venues navigation to the bottom of the mobile screen.
-- Gives the header and month area a bit more vertical breathing room.
-- Keeps the calendar card fully visible, including the bottom rounded corners.
-- Hides the footer on mobile so it does not create extra scroll space.
-- Keeps the mobile calendar page locked to the visible phone height.
-- No App.tsx, Supabase, database, venues, auth, or PWA changes.
+What this does:
+- Cleans the CSS into one full replacement file.
+- Removes stacked/overlapping patch rules.
+- Keeps Calendar / Venues navigation at the bottom on mobile.
+- Restores mobile calendar day containers to 3:4 ratio.
+- Gives the header and month area breathing room.
+- Keeps the footer hidden on mobile to avoid empty scroll space.
+- Keeps the Calendar card visible inside the screen area.
+- Keeps Venues scrollable when its list gets long.
+- Does not change App.tsx, Supabase, database, auth, Storage, or PWA files.
 
-Note:
-The mobile day cells are locked to compact square photo tiles so the full month can fit with the header, month toolbar, view toggle, and bottom nav visible.
+Important:
+This is a full replacement file. Do not paste it below the old CSS.
+Replace src/styles.css completely.
