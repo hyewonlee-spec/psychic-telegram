@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
-import { Camera, ChevronLeft, ChevronRight, ImagePlus, Loader2, LogOut, Trash2, X } from 'lucide-react';
+import { CalendarDays, Camera, ChevronLeft, ChevronRight, Grid3X3, ImagePlus, Loader2, LogOut, Trash2, X } from 'lucide-react';
 import type { Session } from '@supabase/supabase-js';
 import { CALENDAR_PHOTOS_BUCKET, supabase } from './lib/supabase';
 import type { CalendarEntry, EntryWithUrl } from './types';
@@ -132,6 +132,7 @@ function CalendarApp({ session }: { session: Session }) {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [status, setStatus] = useState('');
+  const [viewMode, setViewMode] = useState<'calendar' | 'photos'>('calendar');
 
   const monthDays = useMemo(() => getMonthMatrix(activeMonth), [activeMonth]);
   const selectedEntry = selectedDate ? entries[selectedDate] : undefined;
@@ -283,44 +284,95 @@ function CalendarApp({ session }: { session: Session }) {
           </button>
         </div>
 
+        <div className="view-toggle" aria-label="Calendar display options">
+          <button
+            className={viewMode === 'calendar' ? 'view-toggle__button view-toggle__button--active' : 'view-toggle__button'}
+            type="button"
+            onClick={() => setViewMode('calendar')}
+          >
+            <CalendarDays size={16} />
+            Calendar
+          </button>
+          <button
+            className={viewMode === 'photos' ? 'view-toggle__button view-toggle__button--active' : 'view-toggle__button'}
+            type="button"
+            onClick={() => setViewMode('photos')}
+          >
+            <Grid3X3 size={16} />
+            Photo view
+          </button>
+        </div>
+
         {status && <p className="status-message">{status}</p>}
 
-        <div className="weekday-grid" aria-hidden="true">
-          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-            <span key={day}>{day}</span>
-          ))}
-        </div>
+        {viewMode === 'calendar' ? (
+          <>
+            <div className="weekday-grid" aria-hidden="true">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                <span key={day}>{day}</span>
+              ))}
+            </div>
 
-        <div className="calendar-grid">
-          {monthDays.map((date, index) => {
-            if (!date) return <div className="day-cell day-cell--empty" key={`empty-${index}`} />;
+            <div className="calendar-grid">
+              {monthDays.map((date, index) => {
+                if (!date) return <div className="day-cell day-cell--empty" key={`empty-${index}`} />;
 
-            const dateKey = toDateKey(date);
-            const entry = entries[dateKey];
-            const isToday = dateKey === toDateKey(new Date());
+                const dateKey = toDateKey(date);
+                const entry = entries[dateKey];
+                const isToday = dateKey === toDateKey(new Date());
 
-            return (
-              <button
-                key={dateKey}
-                className={`day-cell ${entry?.signedUrl ? 'day-cell--photo' : ''} ${isToday ? 'day-cell--today' : ''}`}
-                type="button"
-                onClick={() => setSelectedDate(dateKey)}
-              >
-                {entry?.signedUrl ? (
-                  <img src={entry.signedUrl} alt={entry.caption || `Memory for ${dateKey}`} />
-                ) : (
-                  <span className="empty-photo"><ImagePlus size={18} /></span>
-                )}
-                <span className="date-badge">{date.getDate()}</span>
-                {entry?.caption && <span className="caption-strip">{entry.caption}</span>}
-              </button>
-            );
-          })}
-        </div>
+                return (
+                  <button
+                    key={dateKey}
+                    className={`day-cell ${entry?.signedUrl ? 'day-cell--photo' : ''} ${isToday ? 'day-cell--today' : ''}`}
+                    type="button"
+                    onClick={() => setSelectedDate(dateKey)}
+                  >
+                    {entry?.signedUrl ? (
+                      <img src={entry.signedUrl} alt={entry.caption || `Memory for ${dateKey}`} />
+                    ) : (
+                      <span className="empty-photo"><ImagePlus size={18} /></span>
+                    )}
+                    <span className="date-badge">{date.getDate()}</span>
+                    {entry?.caption && <span className="caption-strip">{entry.caption}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        ) : (
+          <section className="photo-view" aria-label="Large monthly photo view">
+            {Object.values(entries).filter((entry) => entry.signedUrl).length === 0 ? (
+              <div className="photo-view-empty">
+                <ImagePlus size={30} />
+                <h3>No photos saved for this month yet.</h3>
+                <p>Switch back to Calendar and tap a day to add your first picture.</p>
+              </div>
+            ) : (
+              Object.values(entries)
+                .filter((entry) => entry.signedUrl)
+                .sort((a, b) => a.entry_date.localeCompare(b.entry_date))
+                .map((entry) => (
+                  <button
+                    key={entry.id}
+                    className="photo-view-card"
+                    type="button"
+                    onClick={() => setSelectedDate(entry.entry_date)}
+                  >
+                    <img src={entry.signedUrl} alt={entry.caption || `Memory for ${entry.entry_date}`} />
+                    <span className="photo-view-date">{formatDisplayDate(entry.entry_date)}</span>
+                    {entry.caption && <span className="photo-view-caption">{entry.caption}</span>}
+                  </button>
+                ))
+            )}
+          </section>
+        )}
       </section>
 
       <footer className="app-footer">
-        Tap a day to add, change, or remove its picture.
+        {viewMode === 'calendar'
+          ? 'Tap a day to add, change, or remove its picture.'
+          : 'Photo view shows this month’s saved pictures in a larger 4:3 layout.'}
       </footer>
 
       {selectedDate && (
