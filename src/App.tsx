@@ -1,5 +1,23 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
-import { CalendarDays, Camera, CheckCircle2, ChevronLeft, ChevronRight, Download, ExternalLink, Grid3X3, ImagePlus, Loader2, LogOut, MapPin, Plus, Search, Star, Trash2, X } from 'lucide-react';
+import {
+  CalendarDays,
+  Camera,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  ExternalLink,
+  Grid3X3,
+  ImagePlus,
+  Loader2,
+  LogOut,
+  MapPin,
+  Plus,
+  Search,
+  Star,
+  Trash2,
+  X,
+} from 'lucide-react';
 import type { Session } from '@supabase/supabase-js';
 import { CALENDAR_PHOTOS_BUCKET, supabase } from './lib/supabase';
 import type { CalendarEntry, EntryWithUrl } from './types';
@@ -15,7 +33,6 @@ type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 };
-
 
 type AppSection = 'calendar' | 'venues';
 
@@ -234,7 +251,7 @@ function CalendarApp({ session }: { session: Session }) {
           ...entry,
           signedUrl: signedData?.signedUrl,
         };
-      })
+      }),
     );
 
     const nextEntries = entriesWithUrls.reduce<Record<string, EntryWithUrl>>((acc, entry) => {
@@ -292,7 +309,7 @@ function CalendarApp({ session }: { session: Session }) {
         caption: input.caption.trim() || null,
         photo_path: photoPath,
       },
-      { onConflict: 'user_id,entry_date' }
+      { onConflict: 'user_id,entry_date' },
     );
 
     if (error) {
@@ -332,11 +349,13 @@ function CalendarApp({ session }: { session: Session }) {
           <p className="eyebrow">{appSection === 'calendar' ? 'Private photo diary' : 'Places to try'}</p>
           <h1>{appSection === 'calendar' ? 'Memory Calendar' : 'Venues'}</h1>
         </div>
+
         <div className="top-actions">
           <button className="install-button" type="button" onClick={handleInstallApp}>
             <Download size={16} />
             Install
           </button>
+
           <button className="icon-button" type="button" onClick={() => supabase.auth.signOut()} aria-label="Sign out">
             <LogOut size={20} />
           </button>
@@ -352,6 +371,7 @@ function CalendarApp({ session }: { session: Session }) {
           <CalendarDays size={16} />
           Calendar
         </button>
+
         <button
           className={appSection === 'venues' ? 'app-nav__button app-nav__button--active' : 'app-nav__button'}
           type="button"
@@ -364,104 +384,116 @@ function CalendarApp({ session }: { session: Session }) {
 
       {appSection === 'calendar' ? (
         <section className="calendar-card">
-        <div className="month-toolbar">
-          <button className="icon-button" type="button" onClick={() => moveMonth(-1)} aria-label="Previous month">
-            <ChevronLeft size={22} />
-          </button>
-          <div>
-            <h2>{formatMonth(activeMonth)}</h2>
-            <p>{loading ? 'Loading photos...' : `${Object.keys(entries).length} saved day${Object.keys(entries).length === 1 ? '' : 's'}`}</p>
+          <div className="month-toolbar">
+            <button className="icon-button" type="button" onClick={() => moveMonth(-1)} aria-label="Previous month">
+              <ChevronLeft size={22} />
+            </button>
+
+            <div>
+              <h2>{formatMonth(activeMonth)}</h2>
+              <p>
+                {loading
+                  ? 'Loading photos...'
+                  : `${Object.keys(entries).length} saved day${Object.keys(entries).length === 1 ? '' : 's'}`}
+              </p>
+            </div>
+
+            <button className="icon-button" type="button" onClick={() => moveMonth(1)} aria-label="Next month">
+              <ChevronRight size={22} />
+            </button>
           </div>
-          <button className="icon-button" type="button" onClick={() => moveMonth(1)} aria-label="Next month">
-            <ChevronRight size={22} />
-          </button>
-        </div>
 
-        <div className="view-toggle" aria-label="Calendar display options">
-          <button
-            className={viewMode === 'calendar' ? 'view-toggle__button view-toggle__button--active' : 'view-toggle__button'}
-            type="button"
-            onClick={() => setViewMode('calendar')}
-          >
-            <CalendarDays size={16} />
-            Calendar
-          </button>
-          <button
-            className={viewMode === 'photos' ? 'view-toggle__button view-toggle__button--active' : 'view-toggle__button'}
-            type="button"
-            onClick={() => setViewMode('photos')}
-          >
-            <Grid3X3 size={16} />
-            Photo view
-          </button>
-        </div>
+          <div className="view-toggle" aria-label="Calendar display options">
+            <button
+              className={viewMode === 'calendar' ? 'view-toggle__button view-toggle__button--active' : 'view-toggle__button'}
+              type="button"
+              onClick={() => setViewMode('calendar')}
+            >
+              <CalendarDays size={16} />
+              Calendar
+            </button>
 
-        {status && <p className="status-message">{status}</p>}
-        {installMessage && <p className="status-message">{installMessage}</p>}
+            <button
+              className={viewMode === 'photos' ? 'view-toggle__button view-toggle__button--active' : 'view-toggle__button'}
+              type="button"
+              onClick={() => setViewMode('photos')}
+            >
+              <Grid3X3 size={16} />
+              Photo view
+            </button>
+          </div>
 
-        {viewMode === 'calendar' ? (
-          <>
-            <div className="weekday-grid" aria-hidden="true">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                <span key={day}>{day}</span>
-              ))}
-            </div>
+          {status && <p className="status-message">{status}</p>}
+          {installMessage && <p className="status-message">{installMessage}</p>}
 
-            <div className="calendar-grid">
-              {monthDays.map((date, index) => {
-                if (!date) return <div className="day-cell day-cell--empty" key={`empty-${index}`} />;
-
-                const dateKey = toDateKey(date);
-                const entry = entries[dateKey];
-                const isToday = dateKey === toDateKey(new Date());
-
-                return (
-                  <button
-                    key={dateKey}
-                    className={`day-cell ${entry?.signedUrl ? 'day-cell--photo' : ''} ${isToday ? 'day-cell--today' : ''}`}
-                    type="button"
-                    onClick={() => setSelectedDate(dateKey)}
-                  >
-                    {entry?.signedUrl ? (
-                      <img src={entry.signedUrl} alt={entry.caption || `Memory for ${dateKey}`} />
-                    ) : (
-                      <span className="empty-photo"><ImagePlus size={18} /></span>
-                    )}
-                    <span className="date-badge">{date.getDate()}</span>
-                    {entry?.caption && <span className="note-dot" aria-label="Caption saved" title={entry.caption} />}
-                    {entry?.caption && <span className="caption-strip">{entry.caption}</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <section className="photo-view" aria-label="Large monthly photo view">
-            {Object.values(entries).filter((entry) => entry.signedUrl).length === 0 ? (
-              <div className="photo-view-empty">
-                <ImagePlus size={30} />
-                <h3>No photos saved for this month yet.</h3>
-                <p>Switch back to Calendar and tap a day to add your first picture.</p>
+          {viewMode === 'calendar' ? (
+            <>
+              <div className="weekday-grid" aria-hidden="true">
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                  <span key={day}>{day}</span>
+                ))}
               </div>
-            ) : (
-              Object.values(entries)
-                .filter((entry) => entry.signedUrl)
-                .sort((a, b) => a.entry_date.localeCompare(b.entry_date))
-                .map((entry) => (
-                  <button
-                    key={entry.id}
-                    className="photo-view-card"
-                    type="button"
-                    onClick={() => setSelectedDate(entry.entry_date)}
-                  >
-                    <img src={entry.signedUrl} alt={entry.caption || `Memory for ${entry.entry_date}`} />
-                    <span className="photo-view-date">{formatDisplayDate(entry.entry_date)}</span>
-                    {entry.caption && <span className="photo-view-caption">{entry.caption}</span>}
-                  </button>
-                ))
-            )}
-          </section>
-        )}
+
+              <div className="calendar-grid">
+                {monthDays.map((date, index) => {
+                  if (!date) return <div className="day-cell day-cell--empty" key={`empty-${index}`} />;
+
+                  const dateKey = toDateKey(date);
+                  const entry = entries[dateKey];
+                  const isToday = dateKey === toDateKey(new Date());
+
+                  return (
+                    <button
+                      key={dateKey}
+                      className={`day-cell ${entry?.signedUrl ? 'day-cell--photo' : ''} ${
+                        isToday ? 'day-cell--today' : ''
+                      }`}
+                      type="button"
+                      onClick={() => setSelectedDate(dateKey)}
+                    >
+                      {entry?.signedUrl ? (
+                        <img src={entry.signedUrl} alt={entry.caption || `Memory for ${dateKey}`} />
+                      ) : (
+                        <span className="empty-photo">
+                          <ImagePlus size={18} />
+                        </span>
+                      )}
+
+                      <span className="date-badge">{date.getDate()}</span>
+                      {entry?.caption && <span className="note-dot" aria-label="Caption saved" title={entry.caption} />}
+                      {entry?.caption && <span className="caption-strip">{entry.caption}</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <section className="photo-view" aria-label="Large monthly photo view">
+              {Object.values(entries).filter((entry) => entry.signedUrl).length === 0 ? (
+                <div className="photo-view-empty">
+                  <ImagePlus size={30} />
+                  <h3>No photos saved for this month yet.</h3>
+                  <p>Switch back to Calendar and tap a day to add your first picture.</p>
+                </div>
+              ) : (
+                Object.values(entries)
+                  .filter((entry) => entry.signedUrl)
+                  .sort((a, b) => a.entry_date.localeCompare(b.entry_date))
+                  .map((entry) => (
+                    <button
+                      key={entry.id}
+                      className="photo-view-card"
+                      type="button"
+                      onClick={() => setSelectedDate(entry.entry_date)}
+                    >
+                      <img src={entry.signedUrl} alt={entry.caption || `Memory for ${entry.entry_date}`} />
+                      <span className="photo-view-date">{formatDisplayDate(entry.entry_date)}</span>
+                      {entry.caption && <span className="photo-view-caption">{entry.caption}</span>}
+                    </button>
+                  ))
+              )}
+            </section>
+          )}
         </section>
       ) : (
         <VenuesPanel session={session} />
@@ -487,7 +519,6 @@ function CalendarApp({ session }: { session: Session }) {
     </main>
   );
 }
-
 
 function cleanInstagramUrl(input: string) {
   const trimmed = input.trim();
@@ -516,6 +547,7 @@ function extractInstagramHandle(input: string) {
 
     const firstPathPart = url.pathname.split('/').filter(Boolean)[0] ?? '';
     const blockedPaths = ['p', 'reel', 'reels', 'stories', 'explore', 'accounts'];
+
     if (!firstPathPart || blockedPaths.includes(firstPathPart.toLowerCase())) return '';
 
     return firstPathPart.replace(/^@/, '');
@@ -578,10 +610,7 @@ function VenuesPanel({ session }: { session: Session }) {
     setLoading(true);
     setStatus('');
 
-    const { data, error } = await supabase
-      .from('venues')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('venues').select('*').order('created_at', { ascending: false });
 
     if (error) {
       setStatus(error.message);
@@ -605,6 +634,7 @@ function VenuesPanel({ session }: { session: Session }) {
   const filteredVenues = venues.filter((venue) => {
     const matchesFilter = filter === 'all' || venue.status === filter;
     const q = search.trim().toLowerCase();
+
     const matchesSearch =
       !q ||
       venue.name.toLowerCase().includes(q) ||
@@ -625,6 +655,7 @@ function VenuesPanel({ session }: { session: Session }) {
           <h2>Places saved from Instagram</h2>
           <p>{loading ? 'Loading venues...' : `${wantToGoCount} to try · ${visitedCount} visited`}</p>
         </div>
+
         <button className="primary-button venue-add-button" type="button" onClick={openNewVenue}>
           <Plus size={18} />
           Add venue
@@ -638,6 +669,7 @@ function VenuesPanel({ session }: { session: Session }) {
           <h3>Quick save Instagram venue</h3>
           <p>Paste an Instagram profile link. The app will save the handle and link — no scraping needed.</p>
         </div>
+
         <button className="secondary-button" type="button" onClick={openNewVenue}>
           Paste link
         </button>
@@ -762,11 +794,13 @@ function VenueCard({ venue, onEdit, onRefresh }: { venue: Venue; onEdit: () => v
             <ExternalLink size={17} />
           </a>
         )}
+
         {venue.status !== 'visited' && (
           <button className="icon-button" type="button" onClick={markVisited} aria-label="Mark visited">
             <CheckCircle2 size={18} />
           </button>
         )}
+
         <button className="secondary-button venue-edit-button" type="button" onClick={onEdit}>
           Edit
         </button>
@@ -792,7 +826,7 @@ function VenueModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   function updateField<K extends keyof VenueFormState>(key: K, value: VenueFormState[K]) {
-    setForm((current: VenueFormState) => ({ ...current, [key]: value }));
+    setForm((current) => ({ ...current, [key]: value }));
   }
 
   function handleInstagramChange(value: string) {
@@ -800,7 +834,7 @@ function VenueModal({
     const handle = extractInstagramHandle(cleanedUrl || value);
     const suggestedName = titleFromInstagramHandle(handle);
 
-    setForm((current: VenueFormState) => ({
+    setForm((current) => ({
       ...current,
       instagram_url: cleanedUrl,
       instagram_handle: handle,
@@ -832,9 +866,7 @@ function VenueModal({
       return;
     }
 
-    const request = venue
-      ? supabase.from('venues').update(payload).eq('id', venue.id)
-      : supabase.from('venues').insert(payload);
+    const request = venue ? supabase.from('venues').update(payload).eq('id', venue.id) : supabase.from('venues').insert(payload);
 
     const { error } = await request;
 
@@ -876,6 +908,7 @@ function VenueModal({
             <p className="eyebrow">{venue ? 'Edit venue' : 'New venue'}</p>
             <h2>{venue ? venue.name : 'Save a place'}</h2>
           </div>
+
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close">
             <X size={20} />
           </button>
@@ -900,12 +933,7 @@ function VenueModal({
 
           <label>
             Venue name
-            <input
-              value={form.name}
-              placeholder="Venue name"
-              onChange={(event) => updateField('name', event.target.value)}
-              required
-            />
+            <input value={form.name} placeholder="Venue name" onChange={(event) => updateField('name', event.target.value)} required />
           </label>
 
           <div className="form-grid-2">
@@ -932,22 +960,20 @@ function VenueModal({
           </div>
 
           {form.status === 'visited' && (
-            <div className="visited-fields">
+            <div className="form-grid-2">
               <label>
                 Rating
-                <div className="star-picker">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      className={form.rating && star <= form.rating ? 'star-button star-button--active' : 'star-button'}
-                      onClick={() => updateField('rating', star)}
-                      aria-label={`${star} stars`}
-                    >
-                      <Star size={22} fill={form.rating && star <= form.rating ? 'currentColor' : 'none'} />
-                    </button>
-                  ))}
-                </div>
+                <select
+                  value={form.rating ?? ''}
+                  onChange={(event) => updateField('rating', event.target.value ? Number(event.target.value) : null)}
+                >
+                  <option value="">No rating</option>
+                  <option value="1">1 star</option>
+                  <option value="2">2 stars</option>
+                  <option value="3">3 stars</option>
+                  <option value="4">4 stars</option>
+                  <option value="5">5 stars</option>
+                </select>
               </label>
 
               <label>
@@ -957,35 +983,36 @@ function VenueModal({
             </div>
           )}
 
-          <textarea
-            className="caption-input"
-            rows={4}
-            placeholder="Notes, what to try, who recommended it..."
-            value={form.notes}
-            onChange={(event) => updateField('notes', event.target.value)}
-          />
+          <label>
+            Notes
+            <textarea value={form.notes} rows={3} onChange={(event) => updateField('notes', event.target.value)} />
+          </label>
 
           {message && <p className="form-message">{message}</p>}
 
           <div className="modal-actions">
-            {venue && (
-              <button className={confirmDelete ? 'danger-button danger-button--confirm' : 'danger-button'} type="button" onClick={handleDelete}>
-                <Trash2 size={16} />
-                {confirmDelete ? 'Tap again to delete' : 'Delete'}
-              </button>
-            )}
-
             <button className="primary-button" type="submit" disabled={saving}>
-              {saving && <Loader2 className="spin" size={18} />}
+              {saving && <Loader2 className="spin" size={17} />}
               Save venue
             </button>
+
+            {venue && (
+              <button
+                className={confirmDelete ? 'danger-button danger-button--confirm' : 'danger-button'}
+                type="button"
+                onClick={handleDelete}
+                disabled={saving}
+              >
+                <Trash2 size={17} />
+                {confirmDelete ? 'Confirm delete' : 'Delete venue'}
+              </button>
+            )}
           </div>
         </form>
       </section>
     </div>
   );
 }
-
 
 function DayModal({
   dateKey,
@@ -1008,19 +1035,45 @@ function DayModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
-    const nextFile = event.target.files?.[0] ?? null;
-    setFile(nextFile);
+    const selectedFile = event.target.files?.[0] ?? null;
+    setFile(selectedFile);
     setRemovePhoto(false);
 
-    if (nextFile) {
-      setPreviewUrl(URL.createObjectURL(nextFile));
+    if (selectedFile) {
+      setPreviewUrl(URL.createObjectURL(selectedFile));
     }
+  }
+
+  function handleRemovePhoto() {
+    setFile(null);
+    setPreviewUrl('');
+    setRemovePhoto(true);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
-    await onSave({ dateKey, caption, file, removePhoto });
+
+    await onSave({
+      dateKey,
+      caption,
+      file,
+      removePhoto,
+    });
+
+    setSaving(false);
+  }
+
+  async function handleDelete() {
+    if (!entry) return;
+
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+
+    setSaving(true);
+    await onDelete(dateKey);
     setSaving(false);
   }
 
@@ -1032,52 +1085,38 @@ function DayModal({
             <p className="eyebrow">Calendar day</p>
             <h2>{formatDisplayDate(dateKey)}</h2>
           </div>
+
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close">
-            <X size={20} />
+            <X size={22} />
           </button>
         </div>
 
         <form className="day-form" onSubmit={handleSubmit}>
           <div className="photo-preview">
-            {previewUrl && !removePhoto ? (
-              <img src={previewUrl} alt="Selected calendar memory" />
+            {previewUrl ? (
+              <img src={previewUrl} alt={caption || `Memory for ${dateKey}`} />
             ) : (
               <div className="photo-placeholder">
-                <Camera size={32} />
-                <span>No picture yet</span>
+                <Camera size={30} />
               </div>
             )}
           </div>
 
           <div className="photo-action-row">
             <label className="upload-control upload-control--compact">
-              <ImagePlus size={16} />
-              {entry?.photo_path || file ? 'Change' : 'Add'}
+              <ImagePlus size={17} />
+              Change
               <input type="file" accept="image/*" onChange={handleFileChange} />
             </label>
 
-            {(entry?.photo_path || file) && !removePhoto && (
-              <button
-                className="secondary-button secondary-button--compact"
-                type="button"
-                onClick={() => {
-                  setFile(null);
-                  setPreviewUrl('');
-                  setRemovePhoto(true);
-                }}
-              >
-                Remove
-              </button>
-            )}
+            <button className="secondary-button secondary-button--compact" type="button" onClick={handleRemovePhoto}>
+              Remove
+            </button>
           </div>
 
-          {file && entry?.photo_path && (
-            <p className="safe-note">Your old picture will stay saved until you tap Save day.</p>
-          )}
-
-          {removePhoto && (
+          {removePhoto && entry?.photo_path && (
             <div className="pending-removal">
-              <p>Picture marked for removal. It will only be deleted after you tap Save day.</p>
+              <p>Photo will be removed when you press Save.</p>
               <button
                 className="text-button"
                 type="button"
@@ -1086,40 +1125,48 @@ function DayModal({
                   setPreviewUrl(entry?.signedUrl ?? '');
                 }}
               >
-                Undo remove picture
+                Undo remove
               </button>
             </div>
           )}
 
           <textarea
             className="caption-input"
-            rows={3}
-            placeholder="Tiny note about this day..."
+            placeholder="Write a short caption..."
             value={caption}
             onChange={(event) => setCaption(event.target.value)}
           />
 
-          <div className="modal-actions">
-            {entry && (
+          <div
+            className="modal-actions modal-actions--same-row"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+              alignItems: 'stretch',
+              gap: '0.55rem',
+              marginTop: '0.1rem',
+            }}
+          >
+            <button className="primary-button" type="submit" disabled={saving}>
+              {saving && <Loader2 className="spin" size={17} />}
+              Save
+            </button>
+
+            {entry ? (
               <button
                 className={confirmDelete ? 'danger-button danger-button--confirm' : 'danger-button'}
                 type="button"
-                onClick={() => {
-                  if (confirmDelete) {
-                    onDelete(dateKey);
-                    return;
-                  }
-                  setConfirmDelete(true);
-                }}
+                onClick={handleDelete}
+                disabled={saving}
               >
-                <Trash2 size={16} />
-                {confirmDelete ? 'Tap again to delete' : 'Delete day'}
+                <Trash2 size={17} />
+                {confirmDelete ? 'Confirm' : 'Delete'}
+              </button>
+            ) : (
+              <button className="danger-button" type="button" onClick={onClose}>
+                Cancel
               </button>
             )}
-            <button className="primary-button" type="submit" disabled={saving}>
-              {saving && <Loader2 className="spin" size={18} />}
-              Save day
-            </button>
           </div>
         </form>
       </section>
