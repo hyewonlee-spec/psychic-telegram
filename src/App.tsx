@@ -493,28 +493,30 @@ function DayModal({
             )}
           </div>
 
-          <label className="upload-control">
-            <ImagePlus size={18} />
-            {entry?.photo_path || file ? 'Change picture' : 'Add picture'}
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-          </label>
+          <div className="photo-action-row">
+            <label className="upload-control upload-control--compact">
+              <ImagePlus size={16} />
+              {entry?.photo_path || file ? 'Change' : 'Add'}
+              <input type="file" accept="image/*" onChange={handleFileChange} />
+            </label>
+
+            {(entry?.photo_path || file) && !removePhoto && (
+              <button
+                className="secondary-button secondary-button--compact"
+                type="button"
+                onClick={() => {
+                  setFile(null);
+                  setPreviewUrl('');
+                  setRemovePhoto(true);
+                }}
+              >
+                Remove
+              </button>
+            )}
+          </div>
 
           {file && entry?.photo_path && (
             <p className="safe-note">Your old picture will stay saved until you tap Save day.</p>
-          )}
-
-          {(entry?.photo_path || file) && !removePhoto && (
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={() => {
-                setFile(null);
-                setPreviewUrl('');
-                setRemovePhoto(true);
-              }}
-            >
-              Remove picture
-            </button>
           )}
 
           {removePhoto && (
@@ -533,15 +535,13 @@ function DayModal({
             </div>
           )}
 
-          <label>
-            Caption
-            <textarea
-              rows={3}
-              placeholder="Tiny note about this day..."
-              value={caption}
-              onChange={(event) => setCaption(event.target.value)}
-            />
-          </label>
+          <textarea
+            className="caption-input"
+            rows={3}
+            placeholder="Tiny note about this day..."
+            value={caption}
+            onChange={(event) => setCaption(event.target.value)}
+          />
 
           <div className="modal-actions">
             {entry && (
