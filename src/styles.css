@@ -1704,3 +1704,67 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   Day modal compact action layout
+   ========================================================================== */
+
+/*
+   Compresses the Calendar Day modal bottom area.
+   Keeps Save and Delete on the same row on mobile.
+*/
+
+.day-modal {
+  height: auto;
+  min-height: 0;
+  max-height: calc(100dvh - 1rem);
+  gap: 0.55rem;
+}
+
+.day-form {
+  flex: 0 0 auto;
+  gap: 0.55rem;
+}
+
+.modal-actions,
+.modal-actions--same-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 0.55rem;
+  margin-top: 0.1rem;
+}
+
+.modal-actions .primary-button,
+.modal-actions .danger-button {
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.55rem 0.8rem;
+}
+
+/* Override earlier mobile rule that stacked the buttons vertically. */
+@media (max-width: 680px) {
+  .day-modal {
+    height: auto;
+    min-height: 0;
+    max-height: calc(100dvh - 1rem);
+    padding-bottom: 0.8rem;
+  }
+
+  .day-form {
+    flex: 0 0 auto;
+  }
+
+  .modal-actions,
+  .modal-actions--same-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex-direction: initial;
+    gap: 0.55rem;
+  }
+
+  .modal-actions .primary-button,
+  .modal-actions .danger-button {
+    min-height: 2.65rem;
+  }
+}
