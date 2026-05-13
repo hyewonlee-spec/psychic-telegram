@@ -1157,3 +1157,154 @@ textarea {
     min-height: 5.8rem;
   }
 }
+
+
+/* ==========================================================================
+   Day modal fit repair — full bottom visible + centered filled photo
+   ========================================================================== */
+
+/*
+   Repairs the mobile modal so the bottom actions are visible on screen.
+   The photo now fills the portrait viewer and is centred both vertically
+   and horizontally.
+*/
+
+.day-modal {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.day-form {
+  gap: 0.75rem;
+}
+
+/* Photo fills the portrait frame instead of sitting with large side gutters. */
+.photo-preview {
+  display: grid;
+  place-items: center;
+  width: min(100%, 17.2rem);
+  aspect-ratio: 3 / 4;
+  max-height: 43svh;
+  justify-self: center;
+}
+
+.photo-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* Keep controls compact so the modal bottom is visible. */
+.photo-action-row {
+  gap: 0.45rem;
+}
+
+.upload-control--compact,
+.secondary-button--compact {
+  min-height: 2.15rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.82rem;
+}
+
+.caption-input {
+  min-height: 4.9rem;
+  max-height: 6.2rem;
+}
+
+.modal-actions {
+  gap: 0.65rem;
+}
+
+.modal-actions .primary-button,
+.modal-actions .danger-button {
+  min-height: 2.65rem;
+  padding-block: 0.65rem;
+}
+
+/* Phone modal: fit the full content into the visible screen. */
+@media (max-width: 680px) {
+  .modal-backdrop {
+    align-items: end;
+    padding: 0.45rem;
+  }
+
+  .day-modal {
+    width: 100%;
+    max-height: calc(100svh - 0.9rem);
+    overflow: auto;
+    padding: 0.75rem;
+    border-radius: 1.25rem;
+  }
+
+  .modal-header {
+    margin-bottom: 0;
+  }
+
+  .modal-header h2 {
+    font-size: clamp(1.35rem, 6vw, 1.8rem);
+    line-height: 1.05;
+  }
+
+  .day-form {
+    gap: 0.62rem;
+  }
+
+  .photo-preview {
+    width: min(100%, 15.8rem);
+    max-height: 39svh;
+    border-radius: 1.15rem;
+  }
+
+  .photo-action-row {
+    gap: 0.4rem;
+  }
+
+  .upload-control--compact,
+  .secondary-button--compact {
+    min-height: 2.05rem;
+    padding: 0.42rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .caption-input {
+    min-height: 4.4rem;
+    max-height: 5.4rem;
+    padding: 0.75rem;
+  }
+
+  .modal-actions {
+    gap: 0.55rem;
+  }
+
+  .modal-actions .primary-button,
+  .modal-actions .danger-button {
+    min-height: 2.45rem;
+    padding-block: 0.55rem;
+  }
+
+  .safe-note,
+  .pending-removal {
+    padding: 0.58rem 0.7rem;
+    font-size: 0.78rem;
+  }
+}
+
+/* Extra-short phone screens: reduce photo height a little more. */
+@media (max-height: 760px) and (max-width: 680px) {
+  .photo-preview {
+    width: min(100%, 14.4rem);
+    max-height: 34svh;
+  }
+
+  .caption-input {
+    min-height: 3.8rem;
+    max-height: 4.5rem;
+  }
+
+  .modal-actions .primary-button,
+  .modal-actions .danger-button {
+    min-height: 2.3rem;
+  }
+}

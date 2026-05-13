@@ -1,19 +1,13 @@
-# Memory Calendar — Modal Photo View Patch
+# Memory Calendar — Modal Fit Repair Patch
 
-Replace these files:
+Replace this file only:
 
-- src/App.tsx
 - src/styles.css
 
-What this changes:
-- The day modal photo preview is now a portrait 3:4 viewer so the image can be viewed more fully.
-- The preview uses object-fit: contain, so it does not aggressively crop inside the modal.
-- "Change picture" is renamed to "Change".
-- "Remove picture" is renamed to "Remove".
-- Change and Remove sit on the same row as smaller buttons.
-- The visible "Caption" label is removed.
-- The caption box remains below the photo action buttons.
-- No Supabase, database, storage, auth, or PWA setup changes.
-
-Build check:
-- Tested with npm run build successfully.
+What this fixes:
+- Makes the bottom of the modal visible on phone screens.
+- Reduces modal spacing and control height.
+- Keeps the photo viewer portrait-shaped.
+- Makes the photo fill the container.
+- Centres the photo vertically and horizontally with object-position: center center.
+- No app logic, Supabase, database, storage, auth, or PWA changes.
